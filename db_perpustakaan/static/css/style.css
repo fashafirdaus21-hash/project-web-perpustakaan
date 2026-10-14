@@ -1,0 +1,221 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #0b192c;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.library-container {
+    display: flex;
+    width: 950px;
+    max-width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* Sisi Kiri: Banner dengan Ilustrasi Kombinasi Gambar */
+.library-banner {
+    flex: 1;
+    background: linear-gradient(rgba(11, 25, 44, 0.9), rgba(11, 25, 44, 0.9)), 
+                url("../images/gedung.png");
+    background-size: cover;
+    background-position: center;
+    color: #ffffff;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-img {
+    width: 45px;
+    height: auto;
+    object-fit: contain;
+}
+
+.school-name {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #ffb200;
+}
+
+.banner-content h1 {
+    font-size: 34px;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.banner-content p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+/* Sisi Kanan: Form Wrapper */
+.library-form-wrapper {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #ffffff;
+}
+
+.form-header {
+    margin-bottom: 22px;
+}
+
+.form-header h2 {
+    font-size: 26px;
+    color: #0b192c;
+    margin-bottom: 4px;
+}
+
+.form-header p {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Input Form dengan Ikon */
+.input-group {
+    margin-bottom: 16px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    opacity: 0.6;
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding: 12px 15px 12px 45px; /* Memberi ruang untuk ikon */
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #334155;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+.input-with-icon input:focus {
+    outline: none;
+    border-color: #1e3e62;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(30, 62, 98, 0.15);
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    margin-bottom: 20px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #475569;
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: #1e3e62;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Tombol Utama & Respons Hover/Active */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #0b192c;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(11, 25, 44, 0.1);
+}
+
+.btn-primary:hover {
+    background-color: #1e3e62;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 62, 98, 0.2);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 22px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.form-footer a {
+    color: #ffb200;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .library-container {
+        flex-direction: column;
+    }
+    .library-banner {
+        padding: 30px 20px;
+    }
+    .library-form-wrapper {
+        padding: 30px 20px;
+    }
+}

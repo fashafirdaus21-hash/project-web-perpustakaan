@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YPPI Library Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="library-container">
+        <!-- Banner Kiri -->
+        <div class="library-banner">
+            <div class="logo-area">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo YPPI" class="logo-img">
+                <span class="school-name">YPPI SMK AL-IKHLAS</span>
+            </div>
+            
+            <div class="banner-content">
+                <h1>Welcome Back!</h1>
+                <p>Welcome back! Let's pick up right where you left off.</p>
+            </div>
+        </div>
+
+        <!-- Form Kanan -->
+        <div class="library-form-wrapper">
+            <div class="form-header">
+                <h2>Registration</h2>
+                <p>Create your account to get started</p>
+            </div>
+
+            <form action="/register" method="POST">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <div class="input-with-icon">
+                        <img src="{{ url_for('static', filename='images/icon-user.png') }}" alt="User Icon" class="input-icon">
+                        <input type="text" id="username" name="username" placeholder="enter your username" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-with-icon">
+                        <img src="{{ url_for('static', filename='images/icon-email.png') }}" alt="Email Icon" class="input-icon">
+                        <input type="email" id="email" name="email" placeholder="you@gmail.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <img src="{{ url_for('static', filename='images/icon-lock.png') }}" alt="Lock Icon" class="input-icon">
+                        <input type="password" id="password" name="password" placeholder="********" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">Register</button>
+            </form>
+
+            <div class="form-footer">
+                <p>Already have an account? <a href="/login">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

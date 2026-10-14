@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YPPI Library Login Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="library-container">
+        <!-- Banner Kiri -->
+        <div class="library-banner">
+            <div class="logo-area">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo YPPI" class="logo-img">
+                <span class="school-name">YPPI SMK AL-IKHLAS</span>
+            </div>
+            
+            <div class="banner-content">
+                <h1>Welcome Back!</h1>
+                <p>Welcome back! Let's pick up right where you left off. One click away from boundless knowledge. Log in to explore.</p>
+            </div>
+        </div>
+
+        <!-- Form Kanan -->
+        <div class="library-form-wrapper">
+            <div class="form-header">
+                <h2>Login</h2>
+                <p>Enter your credentials to access your account</p>
+            </div>
+
+            <form action="/login" method="POST">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <div class="input-with-icon">
+                        <img src="{{ url_for('static', filename='images/icon-user.png') }}" alt="User Icon" class="input-icon">
+                        <input type="text" id="username" name="username" placeholder="enter your username" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <img src="{{ url_for('static', filename='images/icon-lock.png') }}" alt="Lock Icon" class="input-icon">
+                        <input type="password" id="password" name="password" placeholder="********" required>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+
+            <div class="form-footer">
+                <p>Don't have an account? <a href="/register">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
