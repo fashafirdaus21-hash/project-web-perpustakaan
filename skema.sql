@@ -111,9 +111,9 @@ INSERT INTO users (id_user, email, password_hash, nama, role, is_active) VALUES
 ('1002', 'siti@sekolah.sch.id', 'hash_password_siswa', 'Siti Rahma', 'siswa', 1)
 ON DUPLICATE KEY UPDATE email = VALUES(email);
 
-INSERT INTO anggota (id_anggota, nama_lengkap, kelas, email, no_hp, status_keanggotaan, kategori, tanggal_bergabung, masa_berlaku) VALUES
-('1001', 'Budi Santoso', 'X-IPA-1', 'budi@sekolah.sch.id', '081234567890', 'aktif', 'Reguler', '2026-01-10', '2027-01-10'),
-('1002', 'Siti Rahma', 'XI-IPS-2', 'siti@sekolah.sch.id', '089876543210', 'aktif', 'Reguler', '2026-01-10', '2027-01-10')
+INSERT INTO anggota (id_anggota, nama_lengkap, kelas, email, no_hp, status_keanggotaan, tanggal_bergabung, masa_berlaku) VALUES
+('1001', 'Budi Santoso', 'X-IPA-1', 'budi@sekolah.sch.id', '081234567890', 'aktif',  '2026-01-10', '2027-01-10'),
+('1002', 'Siti Rahma', 'XI-IPS-2', 'siti@sekolah.sch.id', '089876543210', 'aktif',  '2026-01-10', '2027-01-10')
 ON DUPLICATE KEY UPDATE nama_lengkap = VALUES(nama_lengkap);
 
 INSERT INTO buku (id_buku, judul, penulis, id_kategori, tahun_terbit, jumlah_total, jumlah_tersedia) VALUES
