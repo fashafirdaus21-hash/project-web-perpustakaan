@@ -1,100 +1,130 @@
--- =========================================================
--- DATABASE PERPUSTAKAAN SEKOLAH DENGAN MULTI-ROLE
--- =========================================================
+-- ==========================================================
+-- SKEMA DATABASE PERPUSTAKAAN SEKOLAH (VERSI TERBARU)
+-- ==========================================================
 
 CREATE DATABASE IF NOT EXISTS db_perpustakaan;
 USE db_perpustakaan;
 
--- 1. TABEL KATEGORI BUKU
-CREATE TABLE kategori (
+-- 1. Tabel USERS (Akun Login & Multi-Role)
+CREATE TABLE IF NOT EXISTS users (
+    id_user VARCHAR(50) PRIMARY KEY, -- NIS untuk siswa, kode khusus untuk admin/kepsek/programmer
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    nama VARCHAR(100) NULL, -- boleh kosong, diisi siswa lewat biodata
+    role ENUM('siswa', 'admin', 'kepsek', 'programmer') NOT NULL,
+    is_active TINYINT(1) DEFAULT 1, -- 1 = aktif, 0 = nonaktif
+    last_login DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Tabel ANGGOTA (Biodata Siswa)
+CREATE TABLE IF NOT EXISTS anggota (
+    id_anggota VARCHAR(50) PRIMARY KEY, -- FK ke users.id_user (NIS)
+    nama_lengkap VARCHAR(100) NULL,
+    kelas VARCHAR(50) NULL,
+    email VARCHAR(100) NULL,
+    no_hp VARCHAR(20) NULL,
+    foto VARCHAR(255) NULL,
+    status_keanggotaan ENUM('aktif', 'nonaktif', 'ditangguhkan') DEFAULT 'aktif',
+    kategori VARCHAR(50) NULL,
+    tanggal_bergabung DATE NULL,
+    masa_berlaku DATE NULL,
+    CONSTRAINT fk_anggota_user FOREIGN KEY (id_anggota) REFERENCES users(id_user) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- 3. Tabel KATEGORI BUKU
+CREATE TABLE IF NOT EXISTS kategori (
     id_kategori INT AUTO_INCREMENT PRIMARY KEY,
-    nama_kategori VARCHAR(50) NOT NULL
+    nama_kategori VARCHAR(100) UNIQUE NOT NULL
 );
 
--- 2. TABEL BUKU
-CREATE TABLE buku (
+-- 4. Tabel BUKU
+CREATE TABLE IF NOT EXISTS buku (
     id_buku INT AUTO_INCREMENT PRIMARY KEY,
-    judul VARCHAR(150) NOT NULL,
-    pengarang VARCHAR(100) NOT NULL,
-    penerbit VARCHAR(100),
-    tahun_terbit INT,
-    stok INT DEFAULT 0,
-    id_kategori INT,
-    FOREIGN KEY (id_kategori) REFERENCES kategori(id_kategori) ON DELETE SET NULL
-);
-
--- 3. TABEL ANGGOTA (DATA PROFIL SISWA)
-CREATE TABLE anggota (
-    id_anggota INT AUTO_INCREMENT PRIMARY KEY,
-    nis VARCHAR(20) UNIQUE NOT NULL,
-    nama VARCHAR(100) NOT NULL,
-    kelas VARCHAR(20) NOT NULL,
-    no_hp VARCHAR(15)
-);
-
--- 4. TABEL PENGGUNA (AKUN LOGIN & HAK AKSES ROLE)
-CREATE TABLE pengguna (
-    id_user INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('murid', 'admin', 'kepala_sekolah') NOT NULL,
-    id_anggota INT NULL, -- Hanya terisi jika role = 'murid'
+    judul VARCHAR(255) NOT NULL,
+    penulis VARCHAR(255) NOT NULL,
+    id_kategori INT NOT NULL,
+    tahun_terbit INT NOT NULL,
+    jumlah_total INT NOT NULL,
+    jumlah_tersedia INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_anggota) REFERENCES anggota(id_anggota) ON DELETE CASCADE
+    CONSTRAINT fk_buku_kategori FOREIGN KEY (id_kategori) REFERENCES kategori(id_kategori) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT chk_jumlah_buku CHECK (jumlah_tersedia <= jumlah_total)
 );
 
--- 5. TABEL PEMINJAMAN (TRANSAKSI)
-CREATE TABLE peminjaman (
+-- 5. Tabel PEMINJAMAN
+CREATE TABLE IF NOT EXISTS peminjaman (
     id_peminjaman INT AUTO_INCREMENT PRIMARY KEY,
-    id_anggota INT NOT NULL,
-    tgl_pinjam DATE NOT NULL,
-    tgl_jatuh_tempo DATE NOT NULL,
-    status ENUM('dipinjam', 'kembali', 'terlambat') DEFAULT 'dipinjam',
-    FOREIGN KEY (id_anggota) REFERENCES anggota(id_anggota) ON DELETE CASCADE
-);
-
--- 6. TABEL DETAIL PEMINJAMAN
-CREATE TABLE detail_peminjaman (
-    id_detail INT AUTO_INCREMENT PRIMARY KEY,
-    id_peminjaman INT NOT NULL,
+    id_anggota VARCHAR(50) NOT NULL,
     id_buku INT NOT NULL,
-    denda INT DEFAULT 0,
-    FOREIGN KEY (id_peminjaman) REFERENCES peminjaman(id_peminjaman) ON DELETE CASCADE,
-    FOREIGN KEY (id_buku) REFERENCES buku(id_buku) ON DELETE CASCADE
+    tgl_pinjam DATE NOT NULL,
+    jatuh_tempo DATE NOT NULL,
+    status ENUM('menunggu', 'dipinjam', 'dikembalikan', 'ditolak') DEFAULT 'menunggu',
+    diproses_oleh VARCHAR(50) NULL, -- FK ke users (admin)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_peminjaman_anggota FOREIGN KEY (id_anggota) REFERENCES anggota(id_anggota) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_peminjaman_buku FOREIGN KEY (id_buku) REFERENCES buku(id_buku) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_peminjaman_admin FOREIGN KEY (diproses_oleh) REFERENCES users(id_user) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT chk_jatuh_tempo CHECK (jatuh_tempo >= tgl_pinjam)
 );
 
--- =========================================================
--- DATA DUMMY UNTUK UJI COBA
--- =========================================================
+-- 6. Tabel PENGEMBALIAN
+CREATE TABLE IF NOT EXISTS pengembalian (
+    id_pengembalian INT AUTO_INCREMENT PRIMARY KEY,
+    id_peminjaman INT NOT NULL UNIQUE, -- 1 peminjaman hanya 1 pengembalian
+    tgl_kembali DATE NOT NULL,
+    kondisi_buku ENUM('baik', 'rusak ringan', 'rusak berat') NOT NULL,
+    denda_telat DECIMAL(10,2) DEFAULT 0.00,
+    denda_rusak DECIMAL(10,2) DEFAULT 0.00,
+    diproses_oleh VARCHAR(50) NULL, -- FK ke users (admin)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_pengembalian_peminjaman FOREIGN KEY (id_peminjaman) REFERENCES peminjaman(id_peminjaman) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_pengembalian_admin FOREIGN KEY (diproses_oleh) REFERENCES users(id_user) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- 7. Tabel PENGATURAN (Konfigurasi Sistem & Denda)
+CREATE TABLE IF NOT EXISTS pengaturan (
+    kunci VARCHAR(50) PRIMARY KEY,
+    nilai VARCHAR(255) NOT NULL,
+    keterangan TEXT NULL
+);
+
+-- ==========================================================
+-- CONTOH DATA AWAL (SEEDER)
+-- ==========================================================
+
+-- Data Pengaturan Sistem
+INSERT INTO pengaturan (kunci, nilai, keterangan) VALUES
+('lama_pinjam_hari', '7', 'Batas waktu peminjaman buku dalam hari'),
+('denda_telat_per_hari', '1000', 'Besaran denda keterlambatan per hari (Rupiah)'),
+('denda_rusak_ringan', '20000', 'Besaran denda jika buku rusak ringan (Rupiah)'),
+('denda_rusak_berat', '50000', 'Besaran denda jika buku rusak berat (Rupiah)')
+ON DUPLICATE KEY UPDATE nilai = VALUES(nilai);
 
 -- Data Kategori
-INSERT INTO kategori (nama_kategori) VALUES 
-('Fiksi'), 
-('Sains'), 
-('Sejarah');
+INSERT INTO kategori (id_kategori, nama_kategori) VALUES
+(1, 'Fiksi'),
+(2, 'Non-Fiksi'),
+(3, 'Referensi')
+ON DUPLICATE KEY UPDATE nama_kategori = VALUES(nama_kategori);
 
--- Data Buku
-INSERT INTO buku (judul, pengarang, penerbit, tahun_terbit, stok, id_kategori) VALUES
-('Laskar Pelangi', 'Andrea Hirata', 'Bentang Pustaka', 2005, 5, 1),
-('Fisika Dasar', 'Halliday & Resnick', 'Erlangga', 2014, 3, 2),
-('Sejarah Indonesia Modern', 'M.C. Ricklefs', 'Serambi', 2008, 2, 3);
+-- Data Users (Programmer, Admin, Kepsek, Siswa)
+INSERT INTO users (id_user, email, password_hash, nama, role, is_active) VALUES
+('PROG01', 'programmer@sekolah.sch.id', 'hash_password_prog', 'Super Admin / Programmer', 'programmer', 1),
+('ADM01', 'admin@sekolah.sch.id', 'hash_password_admin', 'Admin Perpustakaan', 'admin', 1),
+('KEP01', 'kepsek@sekolah.sch.id', 'hash_password_kepsek', 'Kepala Sekolah', 'kepsek', 1),
+('1001', 'budi@sekolah.sch.id', 'hash_password_siswa', 'Budi Santoso', 'siswa', 1),
+('1002', 'siti@sekolah.sch.id', 'hash_password_siswa', 'Siti Rahma', 'siswa', 1)
+ON DUPLICATE KEY UPDATE email = VALUES(email);
 
 -- Data Anggota (Siswa)
-INSERT INTO anggota (nis, nama, kelas, no_hp) VALUES
-('1001', 'Budi Santoso', 'X-IPA-1', '081234567890'),
-('1002', 'Siti Rahma', 'XI-IPS-2', '089876543210');
+INSERT INTO anggota (id_anggota, nama_lengkap, kelas, email, no_hp, status_keanggotaan, kategori, tanggal_bergabung, masa_berlaku) VALUES
+('1001', 'Budi Santoso', 'X-IPA-1', 'budi@sekolah.sch.id', '081234567890', 'aktif', 'Reguler', '2026-01-10', '2027-01-10'),
+('1002', 'Siti Rahma', 'XI-IPS-2', 'siti@sekolah.sch.id', '089876543210', 'aktif', 'Reguler', '2026-01-10', '2027-01-10')
+ON DUPLICATE KEY UPDATE nama_lengkap = VALUES(nama_lengkap);
 
--- Data Akun Pengguna (Login)
-INSERT INTO pengguna (username, password, role, id_anggota) VALUES
-('admin_perpus', 'admin123', 'admin', NULL),
-('kepala_sekolah', 'kepsek123', 'kepala_sekolah', NULL),
-('budi1001', 'siswa123', 'murid', 1),
-('siti1002', 'siswa123', 'murid', 2);
-
--- Data Transaksi Peminjaman
-INSERT INTO peminjaman (id_anggota, tgl_pinjam, tgl_jatuh_tempo, status) VALUES
-(1, '2026-10-01', '2026-10-08', 'dipinjam');
-
--- Detail Peminjaman Buku
-INSERT INTO detail_peminjaman (id_peminjaman, id_buku, denda) VALUES
-(1, 1, 0);
+-- Data Buku
+INSERT INTO buku (id_buku, judul, penulis, id_kategori, tahun_terbit, jumlah_total, jumlah_tersedia) VALUES
+(1, 'Fisika Dasar', 'Halliday & Resnick', 1, 2014, 5, 5),
+(2, 'Sejarah Indonesia Modern', 'M.C. Ricklefs', 2, 2008, 3, 3)
+ON DUPLICATE KEY UPDATE judul = VALUES(judul);
