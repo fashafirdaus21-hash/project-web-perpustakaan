@@ -383,6 +383,123 @@ def proses_pengembalian():
 
 
 
+
+# Rute API Analitik untuk Laporan Kepala Sekolah
+@app.route('/api/laporan/statistik')
+def statistik_kepsek():
+  conn = get_db_connection()
+  cursor = conn.cursor(dictionary=True)
+
+  # 1. Rekap kondisi buku untuk grafik persentase
+  cursor.execute(
+      'SELECT kondisi_buku, COUNT(*) as total FROM pengembalian GROUP BY'
+      ' kondisi_buku'
+  )
+  kondisi_buku = cursor.fetchall()
+
+  # 2. Total ringkasan peminjaman keseluruhan
+  cursor.execute('SELECT COUNT(*) as total_peminjaman FROM peminjaman')
+  total_pinjam = cursor.fetchone()
+
+  cursor.close()
+  conn.close()
+
+  return {
+      'status': 'success',
+      'statistik_kondisi': kondisi_buku,
+      'ringkasan': total_pinjam,
+  }
+
+
+# ==========================================
+# FITUR LAPORAN & ANALITIK (KEPSEK & ADMIN)
+# ==========================================
+
+# 1. Laporan Transaksi Lengkap (Mendukung Pencarian Nama/Judul & Filter Status)
+@app.route('/admin/laporan/transaksi')
+def laporan_transaksi():
+  # Menangkap parameter pencarian opsional dari URL (contoh: /admin/laporan/transaksi?q=budi&status=selesai)
+  keyword = request.args.get('q', '')
+  status = request.args.get('status', '')
+
+  conn = get_db_connection()
+  cursor = conn.cursor(dictionary=True)
+
+  query = """
+        SELECT peminjaman.id_peminjaman, peminjaman.tanggal_pinjam, peminjaman.tanggal_jatuh_tempo, 
+               peminjaman.status, anggota.nama_lengkap, buku.judul, 
+               pengembalian.tanggal_kembali, pengembalian.denda, pengembalian.kondisi_buku
+        FROM peminjaman 
+        JOIN anggota ON peminjaman.id_anggota = anggota.id_anggota 
+        JOIN buku ON peminjaman.id_buku = buku.id_buku
+        LEFT JOIN pengembalian ON peminjaman.id_peminjaman = pengembalian.id_peminjaman
+        WHERE (anggota.nama_lengkap LIKE %s OR buku.judul LIKE %s)
+    """
+
+  search_pattern = f'%{keyword}%'
+  params = [search_pattern, search_pattern]
+
+  if status:
+    query += ' AND peminjaman.status = %s'
+    params.append(status)
+
+  query += ' ORDER BY peminjaman.tanggal_pinjam DESC'
+
+  cursor.execute(query, params)
+  data_laporan = cursor.fetchall()
+
+  cursor.close()
+  conn.close()
+
+  return {'status': 'success', 'laporan_transaksi': data_laporan}
+
+
+# 2. Analitik & Rekap Data (Grafik Peminjaman per Bulan & Kondisi Buku)
+@app.route('/admin/laporan/analitik')
+def analitik_kepsek():
+  conn = get_db_connection()
+  cursor = conn.cursor(dictionary=True)
+
+  # A. Statistik Peminjaman per Bulan (untuk rekap grafik bulanan)
+  cursor.execute("""
+        SELECT DATE_FORMAT(tanggal_pinjam, '%Y-%m') AS bulan, COUNT(*) AS total_peminjaman
+        FROM peminjaman
+        GROUP BY bulan
+        ORDER BY bulan ASC
+    """)
+  peminjaman_per_bulan = cursor.fetchall()
+
+  # B. Statistik Kondisi Buku saat Pengembalian (Persentase Baik / Rusak)
+  cursor.execute("""
+        SELECT kondisi_buku, COUNT(*) AS total
+        FROM pengembalian
+        WHERE kondisi_buku IS NOT NULL
+        GROUP BY kondisi_buku
+    """)
+  kondisi_buku = cursor.fetchall()
+
+  # C. Ringkasan Total Keseluruhan
+  cursor.execute('SELECT COUNT(*) AS total_buku FROM buku')
+  total_buku = cursor.fetchone()['total_buku']
+
+  cursor.execute('SELECT COUNT(*) AS total_peminjaman FROM peminjaman')
+  total_peminjaman = cursor.fetchone()['total_peminjaman']
+
+  cursor.close()
+  conn.close()
+
+  return {
+      'status': 'success',
+      'peminjaman_per_bulan': peminjaman_per_bulan,
+      'kondisi_buku': kondisi_buku,
+      'ringkasan': {
+          'total_buku': total_buku,
+          'total_peminjaman': total_peminjaman,
+      },
+  }
+
+
+
 # ==========================================
 # BAGIAN PALING BAWAH: MENJALANKAN SERVER
 # ==========================================
