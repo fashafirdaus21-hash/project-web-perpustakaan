@@ -1,3 +1,14 @@
+-- Letakkan di paling atas file skema.sql:
+DROP DATABASE IF EXISTS db_perpustakaan;
+CREATE DATABASE db_perpustakaan;
+USE db_perpustakaan;
+
+-- Setelah itu, lanjutkan dengan kode pembuatan tabel yang sudah ada di bawahnya:
+CREATE TABLE IF NOT EXISTS users (
+    id_user VARCHAR(50) PRIMARY KEY,
+    ...
+);
+
 -- ==========================================================
 -- SKEMA DATABASE PERPUSTAKAAN SEKOLAH (VERSI TERBARU)
 -- ==========================================================
