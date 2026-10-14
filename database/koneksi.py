@@ -1,6 +1,30 @@
 import mysql.connector
 
 try:
+  # Membuat sambungan ke database lokal XAMPP
+  db = mysql.connector.connect(
+      host="localhost",
+      user="root",
+      password="",  # Kosongkan jika XAMPP default tidak pakai password
+      database="db_perpustakaan",
+  )
+
+  # Cek apakah koneksi berhasil
+  if db.is_connected():
+    print("Koneksi ke database perpustakaan berhasil!")
+
+except Exception as e:
+  print(f"Koneksi gagal: {e}")
+
+finally:
+  # Menutup koneksi jika sebelumnya terbuka
+  if "db" in locals() and db.is_connected():
+    db.close()
+
+
+import mysql.connector
+
+try:
     # 1. Menghubungkan Python ke Database MySQL di XAMPP
     db = mysql.connector.connect(
         host="localhost",           # Karena server database ada di laptopmu sendiri
