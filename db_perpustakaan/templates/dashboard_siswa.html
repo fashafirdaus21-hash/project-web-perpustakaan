@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Kelas - Sistem Informasi Perpustakaan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navyDark: '#0A192F',
+                        navySidebar: '#0D1B2A',
+                        navyCard: '#1B263B',
+                        navyTable: '#132238',
+                        goldAccent: '#D4AF37',
+                        goldHover: '#C5A028',
+                        goldBadge: '#F4D03F',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A192F;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1B263B;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+    </style>
+</head>
+<body class="bg-navyDark text-slate-100 font-sans antialiased overflow-hidden selection:bg-goldAccent selection:text-navyDark">
+
+    <!-- Desktop App Shell Container -->
+    <div class="flex h-screen w-screen overflow-hidden">
+
+        <!-- ==================== SIDEBAR ==================== -->
+        <aside class="w-64 bg-navySidebar flex flex-col justify-between border-r border-slate-800/80 shrink-0 select-none">
+            <div>
+                <!-- Brand / Logo Header -->
+                <div class="p-5 border-b border-slate-800/60 bg-navyDark/40">
+                    <div class="text-xs font-bold tracking-widest text-goldAccent uppercase mb-0.5">Sistem Informasi</div>
+                    <div class="text-lg font-black tracking-wide text-white">USER KELAS</div>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="p-4 space-y-1.5" id="sidebar-menu">
+                    <button onclick="switchTab('dashboard')" data-tab="dashboard" class="sidebar-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-goldAccent text-navyDark shadow-lg shadow-goldAccent/10">
+                        <i class="fa-solid fa-house w-5 text-center text-base"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('data-buku')" data-tab="data-buku" class="sidebar-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-300 hover:bg-navyCard hover:text-white">
+                        <i class="fa-solid fa-book w-5 text-center text-base"></i>
+                        <span>Data Buku</span>
+                    </button>
+                    <button onclick="switchTab('peminjaman')" data-tab="peminjaman" class="sidebar-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-300 hover:bg-navyCard hover:text-white">
+                        <i class="fa-solid fa-clock-rotate-left w-5 text-center text-base"></i>
+                        <span>Peminjaman Saya</span>
+                    </button>
+                    <button onclick="switchTab('riwayat')" data-tab="riwayat" class="sidebar-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-300 hover:bg-navyCard hover:text-white">
+                        <i class="fa-solid fa-list-check w-5 text-center text-base"></i>
+                        <span>Riwayat</span>
+                    </button>
+                    <button onclick="switchTab('biodata')" data-tab="biodata" class="sidebar-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-300 hover:bg-navyCard hover:text-white">
+                        <i class="fa-solid fa-user w-5 text-center text-base"></i>
+                        <span>Biodata</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Sidebar Footer / Logout -->
+            <div class="p-4 border-t border-slate-800/60">
+                <a href="/" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition-all duration-200">
+                    <i class="fa-solid fa-right-from-bracket w-5 text-center text-base"></i>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ==================== MAIN CONTENT AREA ==================== -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-y-auto bg-navyDark">
+            
+            <!-- Global Top Bar / Header -->
+            <header class="h-16 px-8 bg-navySidebar/70 backdrop-blur-md border-b border-slate-800/80 flex items-center justify-between sticky top-0 z-20">
+                <div class="flex items-center gap-4 text-sm">
+                    <span id="header-breadcrumb" class="font-semibold text-goldAccent tracking-wide">Dashboard</span>
+                    <span class="text-slate-500">|</span>
+                    <span class="text-slate-400 font-light">Selamat Datang di Sistem Informasi Perpustakaan</span>
+                </div>
+                <div class="flex items-center gap-5">
+                    <!-- Global Search -->
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        </span>
+                        <input type="text" placeholder="Cari Buku..." class="bg-navyDark text-sm text-slate-200 pl-9 pr-4 py-1.5 rounded-full border border-slate-700 focus:outline-none focus:border-goldAccent w-56 transition-all shadow-inner">
+                    </div>
+                    <!-- Notification Bell -->
+                    <button class="w-9 h-9 rounded-full bg-navyCard border border-slate-700 flex items-center justify-center text-slate-300 hover:text-goldAccent hover:border-goldAccent transition-all relative">
+                        <i class="fa-regular fa-bell text-sm"></i>
+                        <span class="absolute top-1.5 right-2 w-2 h-2 bg-goldBadge rounded-full"></span>
+                    </button>
+                    <!-- User Profile Avatar Pill -->
+                    <div class="flex items-center gap-3 pl-2 border-l border-slate-700/60">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-goldAccent to-amber-600 flex items-center justify-center text-navyDark font-bold text-sm shadow">
+                            {{ biodata.nama_lengkap[0] if biodata and biodata.nama_lengkap else 'U' }}
+                        </div>
+                        <div class="hidden xl:block text-left leading-tight">
+                            <div class="text-xs font-bold text-white">{{ biodata.nama_lengkap if biodata else 'USER KELAS' }}</div>
+                            <div class="text-[10px] text-slate-400">Anggota Aktif</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic Viewport / Tab Contents -->
+            <div class="p-8 space-y-8 flex-1">
+
+                <!-- 1. DASHBOARD TAB -->
+                <section id="tab-dashboard" class="tab-content space-y-6">
+                    <!-- Welcome Hero Card -->
+                    <div class="bg-gradient-to-r from-navyCard to-[#243550] border border-slate-700/60 rounded-2xl p-8 shadow-xl relative overflow-hidden">
+                        <div class="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-goldAccent/10 to-transparent pointer-events-none"></div>
+                        <div class="max-w-2xl relative z-10">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-goldAccent/10 text-goldBadge text-xs font-semibold mb-3 border border-goldAccent/20">
+                                <i class="fa-solid fa-sparkles"></i> Portal Literasi Akademik
+                            </div>
+                            <h1 class="text-3xl font-extrabold text-white tracking-tight mb-3">Selamat Datang, {{ biodata.nama_lengkap if biodata else 'User' }}</h1>
+                            <p class="text-slate-300 text-sm leading-relaxed font-light">
+                                Tingkatkan literasi dan pengetahuanmu, jelajahi ribuan literatur akademik, pinjam buku langsung dari sini dengan mudah dan cepat.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Cards Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Stat Card 1 -->
+                        <div class="bg-navyCard border border-slate-700/60 rounded-2xl p-6 shadow-lg flex items-center justify-between hover:border-goldAccent/50 transition-all group">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Sedang Dipinjam</p>
+                                <h3 class="text-3xl font-black text-white group-hover:text-goldAccent transition-colors">{{ stat.sedang_dipinjam if stat else 0 }}</h3>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-navyDark border border-slate-700 flex items-center justify-center text-goldAccent text-xl shadow-inner">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                        </div>
+                        <!-- Stat Card 2 -->
+                        <div class="bg-navyCard border border-slate-700/60 rounded-2xl p-6 shadow-lg flex items-center justify-between hover:border-goldAccent/50 transition-all group">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Menunggu Acc</p>
+                                <h3 class="text-3xl font-black text-white group-hover:text-goldAccent transition-colors">{{ stat.menunggu_acc if stat else 0 }}</h3>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-navyDark border border-slate-700 flex items-center justify-center text-goldAccent text-xl shadow-inner">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                        </div>
+                        <!-- Stat Card 3 -->
+                        <div class="bg-navyCard border border-slate-700/60 rounded-2xl p-6 shadow-lg flex items-center justify-between hover:border-goldAccent/50 transition-all group">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Total Denda</p>
+                                <h3 class="text-3xl font-black text-white group-hover:text-goldAccent transition-colors">Rp {{ "{:,.0f}".format(stat.total_denda) if stat else 0 }}</h3>
+                            </div>
+                            <div class="w-14 h-14 rounded-xl bg-navyDark border border-slate-700 flex items-center justify-center text-goldAccent text-xl shadow-inner">
+                                <i class="fa-solid fa-receipt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. DATA BUKU TAB -->
+                <section id="tab-data-buku" class="tab-content space-y-6 hidden">
+                    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                        <h2 class="text-xl font-bold text-white tracking-wide">Data Buku Perpustakaan</h2>
+                        
+                        <!-- Filter & Action Bar -->
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                </span>
+                                <input type="text" placeholder="Cari Buku.." class="bg-navyCard text-sm text-slate-200 pl-9 pr-4 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-goldAccent w-44 shadow-inner">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Books Table -->
+                    <div class="bg-navyCard border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-navyTable text-slate-300 border-b border-slate-700 text-xs font-bold uppercase tracking-wider">
+                                        <th class="py-4 px-6 w-16 text-center">ID</th>
+                                        <th class="py-4 px-6">Judul</th>
+                                        <th class="py-4 px-6">Penulis</th>
+                                        <th class="py-4 px-6">Kategori</th>
+                                        <th class="py-4 px-6 w-24 text-center">Tahun</th>
+                                        <th class="py-4 px-6 text-center w-36">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/80 text-slate-300">
+                                    {% for buku in daftar_buku %}
+                                    <tr class="hover:bg-slate-800/40 transition-colors">
+                                        <td class="py-4 px-6 text-center font-semibold text-white">{{ buku.id_buku }}</td>
+                                        <td class="py-4 px-6 font-medium text-white">{{ buku.judul }}</td>
+                                        <td class="py-4 px-6">{{ buku.penulis if buku.penulis else '-' }}</td>
+                                        <td class="py-4 px-6">{{ buku.nama_kategori if buku.nama_kategori else '-' }}</td>
+                                        <td class="py-4 px-6 text-center">{{ buku.tahun_terbit if buku.tahun_terbit else '-' }}</td>
+                                        <td class="py-4 px-6 text-center">
+                                            {% if buku.jumlah_tersedia > 0 %}
+                                            <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold">
+                                                Tersedia ({{ buku.jumlah_tersedia }}/{{ buku.jumlah_total }})
+                                            </span>
+                                            {% else %}
+                                            <span class="inline-block px-3 py-1 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-full text-xs font-semibold">
+                                                Habis (0/{{ buku.jumlah_total }})
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="py-6 text-center text-slate-500 italic">Belum ada data buku di database.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. PEMINJAMAN SAYA TAB -->
+                <section id="tab-peminjaman" class="tab-content space-y-6 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold text-white tracking-wide">Peminjaman Saya</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Daftar Buku yang Sedang Dipinjam</p>
+                        </div>
+                    </div>
+
+                    <!-- Loan Cards List -->
+                    <div class="space-y-4">
+                        {% set active_loans = riwayat_peminjaman | selectattr('status', 'in', ['dipinjam', 'pending']) | list %}
+                        {% for item in active_loans %}
+                        <div class="bg-navyCard border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-book text-goldAccent text-base"></i>
+                                    <div>
+                                        <h4 class="text-white font-bold text-base">{{ item.judul }}</h4>
+                                        <p class="text-xs text-slate-400">ID Transaksi: {{ item.id_peminjaman }}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    {% if item.status == 'dipinjam' %}
+                                    <span class="px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-semibold">Sedang Dipinjam</span>
+                                    {% elif item.status == 'pending' %}
+                                    <span class="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-xs font-semibold">Menunggu ACC</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-1">
+                                <div class="bg-navyDark/60 p-3 rounded-xl border border-slate-800">
+                                    <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tanggal Pinjam</span>
+                                    <span class="text-sm font-semibold text-white mt-1 block">{{ item.tanggal_pinjam }}</span>
+                                </div>
+                                <div class="bg-navyDark/60 p-3 rounded-xl border border-slate-800">
+                                    <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Jatuh Tempo</span>
+                                    <span class="text-sm font-semibold text-amber-400 mt-1 block">{{ item.tanggal_jatuh_tempo }}</span>
+                                </div>
+                                <div class="bg-navyDark/60 p-3 rounded-xl border border-slate-800">
+                                    <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Status Pinjam</span>
+                                    <span class="text-sm font-semibold text-emerald-400 mt-1 block">{{ item.status | capitalize }}</span>
+                                </div>
+                                <div class="bg-navyDark/60 p-3 rounded-xl border border-slate-800">
+                                    <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Diproses Oleh</span>
+                                    <span class="text-sm font-semibold text-goldBadge mt-1 block">Admin Library</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="bg-navyCard border border-slate-700/60 rounded-2xl p-8 text-center text-slate-400">
+                            Tidak ada peminjaman buku aktif saat ini.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- 4. RIWAYAT TAB -->
+                <section id="tab-riwayat" class="tab-content space-y-6 hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold text-white tracking-wide">Riwayat</h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Riwayat Aktivitas & Pengembalian Selesai</p>
+                        </div>
+                    </div>
+
+                    <!-- History Cards List -->
+                    <div class="space-y-4">
+                        {% set history_loans = riwayat_peminjaman | selectattr('status', 'equalto', 'dikembalikan') | list %}
+                        {% for item in history_loans %}
+                        <div class="bg-navyCard border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-book text-goldAccent text-base"></i>
+                                    <div>
+                                        <h4 class="text-white font-bold text-base">{{ item.judul }}</h4>
+                                        <p class="text-xs text-slate-400">ID Transaksi: {{ item.id_peminjaman }}</p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold">Selesai / Dikembalikan</span>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-1">
+                                <div class="bg-navyDark/60 p-3 rounded-xl border border-slate-800">
+                                    <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tanggal Pinjam</span>
+                                    <span class="text-sm font-semibold text-white mt-1 block">{{ item.tanggal_pinjam }}</span>
+                                </div>
+                                <div class="bg-navyDark/60 p-3 rounded-xl border border-slate-800">
+                                    <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Jatuh Tempo</span>
+                                    <span class="text-sm font-semibold text-amber-400 mt-1 block">{{ item.tanggal_jatuh_tempo }}</span>
+                                </div>
+                                <div class="bg-navyDark/60 p-3 rounded-xl border border-slate-800">
+                                    <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Status</span>
+                                    <span class="text-sm font-semibold text-emerald-400 mt-1 block">Dikembalikan</span>
+                                </div>
+                                <div class="bg-navyDark/60 p-3 rounded-xl border border-slate-800">
+                                    <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Keterangan</span>
+                                    <span class="text-sm font-semibold text-goldBadge mt-1 block">Selesai</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="bg-navyCard border border-slate-700/60 rounded-2xl p-8 text-center text-slate-400">
+                            Belum ada riwayat peminjaman yang selesai.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- 5. BIODATA TAB -->
+                <section id="tab-biodata" class="tab-content space-y-6 hidden">
+                    <h2 class="text-xl font-bold text-white tracking-wide">Biodata</h2>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        <!-- Left Column: Photo & Stats -->
+                        <div class="lg:col-span-4 space-y-6">
+                            <!-- Avatar / Photo Card -->
+                            <div class="bg-navyCard border border-slate-700/60 rounded-2xl p-6 shadow-xl flex flex-col items-center text-center">
+                                <div class="w-48 h-48 rounded-2xl overflow-hidden border-2 border-slate-700 mb-4 shadow-inner bg-slate-900 flex items-center justify-center text-4xl font-bold text-goldAccent">
+                                    {{ biodata.nama_lengkap[0] if biodata and biodata.nama_lengkap else 'U' }}
+                                </div>
+                                <div class="text-white font-bold text-base">{{ biodata.nama_lengkap if biodata else '-' }}</div>
+                                <div class="text-xs text-slate-400 mt-1">Kelas: {{ biodata.kelas if biodata else '-' }}</div>
+                            </div>
+
+                            <!-- Statistik Aktivitas Card -->
+                            <div class="bg-navyCard border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-4">
+                                <h3 class="text-sm font-bold text-white tracking-wide border-b border-slate-700/60 pb-3">Statistik Aktivitas</h3>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex justify-between items-center text-slate-300">
+                                        <span class="font-light">Buku Dipinjam</span>
+                                        <span class="font-bold text-white">{{ stat.sedang_dipinjam if stat else 0 }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-slate-300">
+                                        <span class="font-light">Total Riwayat</span>
+                                        <span class="font-bold text-white">{{ riwayat_peminjaman | length if riwayat_peminjaman else 0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Personal Detail Fields -->
+                        <div class="lg:col-span-8 bg-navyCard border border-slate-700/60 rounded-2xl p-8 shadow-xl space-y-6 relative">
+                            <div class="space-y-4 text-sm">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 py-3 border-b border-slate-800 items-center">
+                                    <span class="text-slate-400 font-medium">ID Anggota / NIS</span>
+                                    <span class="md:col-span-2 text-white font-semibold">: {{ biodata.id_anggota if biodata else '-' }}</span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 py-3 border-b border-slate-800 items-center">
+                                    <span class="text-slate-400 font-medium">Nama Lengkap</span>
+                                    <span class="md:col-span-2 text-white font-semibold">: {{ biodata.nama_lengkap if biodata else '-' }}</span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 py-3 border-b border-slate-800 items-center">
+                                    <span class="text-slate-400 font-medium">Kelas</span>
+                                    <span class="md:col-span-2 text-white font-semibold">: {{ biodata.kelas if biodata else '-' }}</span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 py-3 border-b border-slate-800 items-center">
+                                    <span class="text-slate-400 font-medium">Status Keanggotaan</span>
+                                    <span class="md:col-span-2 text-emerald-400 font-semibold">: {{ biodata.status_keanggotaan | capitalize if biodata and biodata.status_keanggotaan else 'Aktif' }}</span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 py-3 items-center">
+                                    <span class="text-slate-400 font-medium">Kategori</span>
+                                    <span class="md:col-span-2 text-goldBadge font-semibold">: {{ biodata.kategori if biodata else '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Custom Toast Notification Box -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-navyCard border border-goldAccent/40 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-goldAccent text-lg"></i>
+            <span id="toast-message" class="text-sm font-medium">Pesan sistem...</span>
+        </div>
+    </div>
+
+    <!-- JavaScript Interactive Tab Switching and Toast Controller -->
+    <script>
+        function switchTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.classList.add('hidden');
+            });
+
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) {
+                targetTab.classList.remove('hidden');
+            }
+
+            const buttons = document.querySelectorAll('.sidebar-btn');
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabId) {
+                    btn.className = "sidebar-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-goldAccent text-navyDark shadow-lg shadow-goldAccent/10";
+                } else {
+                    btn.className = "sidebar-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-300 hover:bg-navyCard hover:text-white";
+                }
+            });
+
+            const titles = {
+                'dashboard': 'Dashboard',
+                'data-buku': 'Data Buku',
+                'peminjaman': 'Peminjaman Saya',
+                'riwayat': 'Riwayat',
+                'biodata': 'Biodata'
+            };
+            document.getElementById('header-breadcrumb').innerText = titles[tabId] || 'Dashboard';
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const msgSpan = document.getElementById('toast-message');
+            msgSpan.innerText = message;
+            
+            container.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                container.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>

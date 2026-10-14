@@ -3,64 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YPPI Library Login Portal</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Login - Sistem Informasi Perpustakaan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-
-    <div class="library-container">
-        <!-- Banner Kiri -->
-        <div class="library-banner">
-            <div class="logo-area">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo YPPI" class="logo-img">
-                <span class="school-name">YPPI SMK AL-IKHLAS</span>
+<body class="bg-slate-900 text-slate-100 flex items-center justify-center h-screen m-0 font-sans">
+    <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl w-96 border border-slate-700">
+        <div class="text-center mb-6">
+            <span class="text-xs font-bold text-amber-400 tracking-widest uppercase">Sistem Informasi</span>
+            <h2 class="text-2xl font-black text-white mt-1">PERPUSTAKAAN</h2>
+        </div>
+        
+        <form action="/login" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1.5">ID Pengguna / NIS / Admin</label>
+                <input type="text" name="id_user" required placeholder="Masukkan ID..." class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:outline-none focus:border-amber-400 text-sm text-white">
             </div>
             
-            <div class="banner-content">
-                <h1>Welcome Back!</h1>
-                <p>Welcome back! Let's pick up right where you left off. One click away from boundless knowledge. Log in to explore.</p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1.5">Kata Sandi</label>
+                <input type="password" name="password" required placeholder="Masukkan password..." class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:outline-none focus:border-amber-400 text-sm text-white">
             </div>
-        </div>
-
-        <!-- Form Kanan -->
-        <div class="library-form-wrapper">
-            <div class="form-header">
-                <h2>Login</h2>
-                <p>Enter your credentials to access your account</p>
-            </div>
-
-            <form action="/login" method="POST">
-                <div class="input-group">
-                    <label for="username">Username</label>
-                    <div class="input-with-icon">
-                        <img src="{{ url_for('static', filename='images/icon-user.png') }}" alt="User Icon" class="input-icon">
-                        <input type="text" id="username" name="username" placeholder="enter your username" required>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <div class="input-with-icon">
-                        <img src="{{ url_for('static', filename='images/icon-lock.png') }}" alt="Lock Icon" class="input-icon">
-                        <input type="password" id="password" name="password" placeholder="********" required>
-                    </div>
-                </div>
-
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox" name="remember"> Remember me
-                    </label>
-                    <a href="#" class="forgot-password">Forgot password?</a>
-                </div>
-
-                <button type="submit" class="btn-primary">Login</button>
-            </form>
-
-            <div class="form-footer">
-                <p>Don't have an account? <a href="/register">Sign up</a></p>
-            </div>
-        </div>
+            
+            <button type="submit" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold py-3 rounded-xl transition-all shadow-lg text-sm tracking-wide mt-2">
+                Masuk ke Sistem
+            </button>
+        </form>
     </div>
-
 </body>
 </html>
