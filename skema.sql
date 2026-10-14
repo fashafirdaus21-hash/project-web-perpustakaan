@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS anggota (
     no_hp VARCHAR(20) NULL,
     foto VARCHAR(255) NULL,
     status_keanggotaan ENUM('aktif', 'nonaktif', 'ditangguhkan') DEFAULT 'aktif',
-    kategori VARCHAR(50) NULL,
     tanggal_bergabung DATE NULL,
     masa_berlaku DATE NULL,
     CONSTRAINT fk_anggota_user FOREIGN KEY (id_anggota) REFERENCES users(id_user) ON DELETE CASCADE ON UPDATE CASCADE
